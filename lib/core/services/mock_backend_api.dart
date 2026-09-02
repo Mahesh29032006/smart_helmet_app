@@ -9,7 +9,10 @@ class MockBackendApiClient implements BackendApiClient {
   final Map<String, Incident> _incidents = {};
   final Map<String, Responder> _responders = {};
 
-  MockBackendApiClient({List<Responder>? initialResponders}) {
+  MockBackendApiClient({
+    List<Responder>? initialResponders,
+    List<Incident>? initialIncidents,
+  }) {
     if (initialResponders != null) {
       for (final r in initialResponders) {
         _responders[r.id] = r;
@@ -17,10 +20,17 @@ class MockBackendApiClient implements BackendApiClient {
     } else {
       _seedDefaultResponders();
     }
+
+    if (initialIncidents != null) {
+      for (final inc in initialIncidents) {
+        _incidents[inc.id] = inc;
+      }
+    } else {
+      _seedDefaultIncidents();
+    }
   }
 
   void _seedDefaultResponders() {
-    // Reference center (e.g. Bhubaneswar 20.2961, 85.8245)
     final now = DateTime.now();
 
     final defaultList = [
@@ -111,12 +121,96 @@ class MockBackendApiClient implements BackendApiClient {
     }
   }
 
+  void _seedDefaultIncidents() {
+    final now = DateTime.now();
+
+    final defaultIncidents = [
+      Incident(
+        id: 'inc-101',
+        timestamp: now.subtract(const Duration(minutes: 42)),
+        location: LocationData(
+          latitude: 20.2961,
+          longitude: 85.8245,
+          timestamp: now.subtract(const Duration(minutes: 42)),
+          address: 'Janpath Rd, Saheed Nagar, Bhubaneswar',
+        ),
+        severity: IncidentSeverity.critical,
+        status: IncidentStatus.resolved,
+        crashConfidence: 0.98,
+        assignedResponderId: 'amb-01',
+        assignedHospitalId: 'hosp-01',
+        distanceKm: 1.2,
+        etaMinutes: 3.5,
+        notes: 'High impact collision detected at 55 km/h. Responders delivered patient successfully.',
+        metadata: {
+          'peakGForce': 4.8,
+          'peakAngularVelocity': 3.6,
+          'trigger': 'Multi-signal crash trigger',
+        },
+      ),
+      Incident(
+        id: 'inc-102',
+        timestamp: now.subtract(const Duration(minutes: 18)),
+        location: LocationData(
+          latitude: 20.3250,
+          longitude: 85.8150,
+          timestamp: now.subtract(const Duration(minutes: 18)),
+          address: 'NH-16 Flyover, Jayadev Vihar, Bhubaneswar',
+        ),
+        severity: IncidentSeverity.high,
+        status: IncidentStatus.inProgress,
+        crashConfidence: 0.92,
+        assignedResponderId: 'amb-02',
+        assignedHospitalId: 'hosp-01',
+        distanceKm: 2.8,
+        etaMinutes: 6.0,
+        notes: 'Side impact rollover detected. Ambulance en route with trauma team.',
+        metadata: {
+          'peakGForce': 3.9,
+          'peakAngularVelocity': 2.9,
+          'trigger': 'High G-Force deceleration',
+        },
+      ),
+      Incident(
+        id: 'inc-103',
+        timestamp: now.subtract(const Duration(minutes: 5)),
+        location: LocationData(
+          latitude: 20.3080,
+          longitude: 85.8320,
+          timestamp: now.subtract(const Duration(minutes: 5)),
+          address: 'Station Square, Master Canteen, Bhubaneswar',
+        ),
+        severity: IncidentSeverity.medium,
+        status: IncidentStatus.open,
+        crashConfidence: 0.76,
+        notes: 'Moderate sudden deceleration detected. Awaiting dispatch triage.',
+        metadata: {
+          'peakGForce': 2.8,
+          'peakAngularVelocity': 1.8,
+          'trigger': 'Moderate deceleration spike',
+        },
+      ),
+    ];
+
+    for (final inc in defaultIncidents) {
+      _incidents[inc.id] = inc;
+    }
+  }
+
   void addResponder(Responder responder) {
     _responders[responder.id] = responder;
   }
 
   void clearResponders() {
     _responders.clear();
+  }
+
+  void addIncident(Incident incident) {
+    _incidents[incident.id] = incident;
+  }
+
+  void clearIncidents() {
+    _incidents.clear();
   }
 
   @override
@@ -134,6 +228,13 @@ class MockBackendApiClient implements BackendApiClient {
   @override
   Future<Incident?> getIncident(String incidentId) async {
     return _incidents[incidentId];
+  }
+
+  @override
+  Future<List<Incident>> getAllIncidents() async {
+    final list = _incidents.values.toList();
+    list.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    return list;
   }
 
   @override

@@ -31,7 +31,7 @@ class StateMachineService {
 
   void startMonitoring(Stream<CrashDetectionEvent> crashStream) {
     _state = EmergencyState.monitoring;
-    _stateController.add(_state);
+    Future.microtask(() => _stateController.add(_state));
 
     _crashSubscription?.cancel();
     _crashSubscription = crashStream.listen((event) {

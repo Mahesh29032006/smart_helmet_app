@@ -33,7 +33,7 @@ class WebSocketService {
 
   /// Establishes connection to the WebSocket server endpoint.
   Future<void> connect([String? url]) async {
-    final targetUrl = url ?? defaultUrl ?? 'ws://localhost:5000/socket.io';
+    final targetUrl = url ?? defaultUrl ?? 'ws://localhost:5001/socket.io';
     _currentUrl = targetUrl;
     _isConnected = true;
     _connectionController.add(true);

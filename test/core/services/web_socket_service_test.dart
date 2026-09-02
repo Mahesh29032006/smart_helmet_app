@@ -7,7 +7,7 @@ void main() {
     late WebSocketService wsService;
 
     setUp(() {
-      wsService = WebSocketService('ws://localhost:5000/socket.io');
+      wsService = WebSocketService('ws://localhost:5001/socket.io');
     });
 
     tearDown(() {
@@ -23,7 +23,7 @@ void main() {
       await wsService.connect();
 
       expect(wsService.isConnected, isTrue);
-      expect(wsService.currentUrl, 'ws://localhost:5000/socket.io');
+      expect(wsService.currentUrl, 'ws://localhost:5001/socket.io');
       expect(connectionStates, contains(true));
 
       await sub.cancel();

@@ -8,6 +8,7 @@ abstract class BackendApiClient {
   Future<Incident> createIncident(Incident incident);
   Future<Incident> updateIncident(Incident incident);
   Future<Incident?> getIncident(String incidentId);
+  Future<List<Incident>> getAllIncidents();
   Future<List<Responder>> findNearestResponders(
     LocationData location, {
     double radiusKm = 10.0,
